@@ -1,0 +1,38 @@
+# FarePlay Discovery Service - Development Rules
+
+## Architecture
+- Fastify web framework
+- Prisma ORM with PostgreSQL
+- Solana signature verification (not Ethereum!)
+- TypeScript strict mode
+
+## Signature Format
+**CRITICAL**: All signatures must use sorted keys!
+```typescript
+const message = JSON.stringify(data, Object.keys(data).sort());
+```
+This matches the SDK format in `@fareplay/sdk/src/crypto/sign.ts`
+
+## Testing
+- Run `npm test` before committing
+- All 62 tests must pass
+- Tests validate against actual `@fareplay/sdk` schemas
+- Sequential test execution to avoid database conflicts
+
+## Database
+- Single database for dev and test
+- Tests clean data in `beforeEach`
+- Use `docker compose up -d postgres` to start
+- PostgreSQL credentials: postgres/postgres
+
+## Code Style
+- No console.log - use logger from `src/utils/logger.ts`
+- All responses must follow `ApiResponse<T>` format
+- Error codes from `ErrorCodes` const
+- Zod validation for all inputs
+
+## SDK Compatibility
+- Import schemas from `@fareplay/sdk` (not `@fareplay/sdk/src/schema`)
+- Match SDK types exactly
+- Test all changes against SDK validation tests
+

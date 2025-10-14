@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Casino {
+  id String @id @default(uuid())
+  
+  // Solana Identity
+  publicKey String @unique // Solana public key in base58
+  
+  // Basic Info
+  name   String
+  url    String
+  status String @default("online") // online, offline, maintenance, suspended
+  
+  // Metadata (stored as JSON)
+  description      String?
+  games            String[] // Array of game types
+  logo             String?
+  banner           String?
+  
+  // Social Links
+  twitterUrl       String?
+  discordUrl       String?
+  telegramUrl      String?
+  websiteUrl       String?
+  
+  // Bet Limits
+  maxBetAmount     Float?
+  minBetAmount     Float?
+  supportedTokens  String[] @default(["SOL"])
+  
+  // Protocol Version
+  version          String @default("1.0.0")
+  
+  // Timestamps
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  lastHeartbeat    DateTime?
+  
+  // Relations
+  heartbeats Heartbeat[]
+  
+  @@index([publicKey])
+  @@index([status])
+  @@index([lastHeartbeat])
+}
+
+model Heartbeat {
+  id String @id @default(uuid())
+  
+  casinoId String
+  casino   Casino @relation(fields: [casinoId], references: [id], onDelete: Cascade)
+  
+  // Status at time of heartbeat
+  status String // online, offline, maintenance, suspended
+  
+  // Metrics
+  activePlayers Int?
+  totalBets24h  Float?
+  uptime        Int? // In seconds
+  responseTime  Float? // In milliseconds
+  
+  // Metadata
+  timestamp DateTime @default(now())
+  signature String
+  
+  @@index([casinoId])
+  @@index([timestamp])
+}
+
