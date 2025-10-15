@@ -32,7 +32,7 @@ async function main() {
           logger.info(`Marked ${count} casino(s) as inactive`);
         }
       } catch (error) {
-        logger.error('Failed to mark inactive casinos:', error);
+        logger.error({ err: error }, 'Failed to mark inactive casinos');
       }
     }, 60000); // Check every minute
 
@@ -52,7 +52,7 @@ async function main() {
     process.on('SIGINT', () => shutdown('SIGINT'));
 
   } catch (error) {
-    logger.error('Failed to start application:', error);
+    logger.error({ err: error }, 'Failed to start application');
     process.exit(1);
   }
 }
